@@ -1,21 +1,35 @@
-- Java, JavaTypes
-  - What’s Value Objects
-  - Why Value Objects Immutability is the thing
-- Java and the boilerplate code 
-  - Java class usefullne
-    - getter
-    - hashcode
-    - equals
-    - toString
-- AutoValue
-    - Simple Example
-        - livetemplate create
-    - Factory
-    - Builder
-    - Parcelable
-    - Gson
-        - Serializable
-        - livetemplate typeAdapter
+# Java, JavaTypes
+## What’s Value Objects
+
+## Why Value Objects Immutability is the thing
+
+# Java and the boilerplate code 
+## Java Value Object composition
+### Getters
+
+### Hashcode
+
+### Equals
+
+### toString
+
+# AutoValue
+## Set It Up
+
+## Simple Example
+ livetemplate create
+## Factory
+
+## Builder
+
+## Parcelable
+gradle
+
+## Gson
+gradle
+### SerializableName('')
+
+livetemplate typeAdapter
 
   
   Sources:  

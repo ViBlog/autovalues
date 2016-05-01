@@ -209,7 +209,7 @@ data class User(val name: String, val email: String, val location: Location)
 ```
 
 # AutoValue
-As said in the begginning, Google saved our sanity by creating this library with the help of some collaborators, let's have a look at it.
+As said in the begginning, Google saved our sanity by creating this library with the help of some collaborators. A very good job have been done on the documentation. It's the [best documented library][autoValueDoc] I have ever used.
 
 ## Seting It Up
 You will need to add the APT processor on your main build.gradle.
@@ -230,22 +230,68 @@ apply plugin: 'com.neenbedankt.android-apt'
 dependencies {
   apt 'com.google.auto.value:auto-value:1.2'
   provided 'com.jakewharton.auto.value:auto-value-annotations:1.2-update1'
-  apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.1'
-  apt 'com.ryanharter.auto.value:auto-value-gson:0.2.5'
 }
 ```
 
 ## Simple Example
- livetemplate create
-## Factory
+So this is what we have to write to have the same class as above but without the Parcelable. 9 lines... I trully think that's awesome. 
+
+```java
+@AutoValue
+public abstract class User {
+    public abstract String name();
+    public abstract String email();
+    public abstract Location location();
+
+    public static User create(String name, String email, Location location) {
+        return new AutoValue_User(name, email, location);
+    }
+}
+```
+
+As the time of writting this, I'm working on a new project for the Montreal Agency [Tractr][tractr] and I have created dozens of those objects for the API Client and it saved me a lot of time and probably headaches with the immutability way.
+
+### Create object live template
+When creating those object I often had trouble while writing the creator because the AutoValue_class was not yet generated. To avoid typos, I created this little live template to help. If you find a way to add the abstract methods directly in it, let me know.
+
+```java
+public static $class$ create($parameters$) {
+    return new AutoValue_$class$($createparameters$);
+}
+```
+![Live template to create object][liveTemplateCreate]
+
+## Parcelable
+To have exactly the same object as before we need to add the parcelable code. Fortunately for us, an extension have been created that does exactly that. Add it to your gradle build file.
+
+```Module:app - build.gradle```
+```
+dependencies {
+  [...]
+  apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.1'
+  [...]
+}
+```
+
+Make the User implement Parcelable and here we go, our class generated will handle it. No more code needed.
+```java 
+public abstract class User implements Parcelable { [...] }
+```
+
 
 ## Builder
 
-## Parcelable
-gradle
+
+## Factory
+
+
+
 
 ## Gson
 gradle
+
+
+apt 'com.ryanharter.auto.value:auto-value-gson:0.2.5'
 ### SerializableName('')
 
 livetemplate typeAdapter
@@ -259,7 +305,12 @@ livetemplate typeAdapter
   [RHarterIntroAutoValue]:http://ryanharter.com/blog/2016/03/22/autovalue/
   [RHarterCreateExtentions]:http://ryanharter.com/blog/2016/04/08/autovalue-deep-dive/
   [kotlinDataClass]:https://kotlinlang.org/docs/reference/data-classes.html
+  [autoValueDoc]:https://github.com/google/auto/blob/master/value/userguide/index.md
+  [tractr]:http://tractr.net/
   
+  
+  <!-- Images -->
+  [liveTemplateCreate]:images/liveTemplateCreate.png
   
   Sources:  
   [Immutability Oracle JavaSE](https://docs.oracle.com/javase/tutorial/essential/concurrency/immutable.html)  

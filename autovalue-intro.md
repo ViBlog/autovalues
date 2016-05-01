@@ -97,7 +97,7 @@ public final class User {
 
 That's 10 lines.
 
-### Getters
+## Getters
 To access the instance's values we have to create getters. Let's add 9 more lines to make it 19 in total.
 
 ```java
@@ -115,7 +115,7 @@ private Location getLocation() {
 }
 [...]
 ```
-On a side note, if you return a mutable object in the getter, Java will return the reference to the object. Doing so, this object will be able to be modified breaking the advantages of the Immutability. To avoid that you will have to return a clone of the object.
+On a side note, if you return a mutable object in the getter, Java will return the reference to the object. Doing so, this object will be able to be modified breaking the advantages of the Immutability. To avoid that you will have to return a clone of the object. You should also take care of the memory cost of doing so. Not much more choices there, choose carefully.
 
 ```java
 private Location getLocation() {
@@ -123,7 +123,7 @@ private Location getLocation() {
 }
 ```
 
-### Hashcode() & Equals()
+## Hashcode() & Equals()
 To handle the equals by values and not by reference we have to generate the equals() and hashcode(). As with the getters, IntelliJ is a good software and let's you generate this code by using ```Ctrl+Enter``` (mac). Unfortunately you will have to never forget to delete and redo it each time you add a new variable else it will forget to compare the new ones. Not really mistake proof. Ow, and that's 22 more lines. 41 lines now...
 
 ```java
@@ -151,10 +151,89 @@ public int hashCode() {
 }
 ```
 
-### toString
+## Parcelable
+Welcome in Android world, if you want to share your object through an ```Intent``` by example you will have to implement the parcelable class. BOOM 29 more lines -> 70 lines written / generated.
+
+```java
+@Override
+public int describeContents() {
+    return 0;
+}
+
+@Override
+public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(this.name);
+    dest.writeString(this.email);
+    dest.writeParcelable(this.location, flags);
+}
+
+protected User(Parcel in) {
+    this.name = in.readString();
+    this.email = in.readString();
+    this.location = in.readParcelable(Location.class.getClassLoader());
+}
+
+public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+    @Override
+    public User createFromParcel(Parcel source) {
+        return new User(source);
+    }
+
+    @Override
+    public User[] newArray(int size) {
+        return new User[size];
+    }
+};
+```
+
+## toString
+For aesthetics, and at this point of we can definitely add a little ```toString()``` to display a human readable object for your logs or debugging session by example. What's the score now? 78 lines. Not that bad for only one object.
+
+```java
+@Override
+public String toString() {
+    return "User{" +
+            "name='" + name + '\'' +
+            ", email='" + email + '\'' +
+            ", location=" + location +
+            '}';
+}
+```
+## Half way conclusion
+We had to write and generate 78 lines to create a Java Value Object. From those we will have to take care to modify 30% of them if we add or delete a new variable. It's a mistake that can cause problems and are difficult to debug because we tend to slip over those methods without really reading them.
+
+On a side note, we can create this kind of class easily in kotlin by using a [data class][kotlinDataClass]. (Parcelable will not be part of the deal though)
+
+```
+data class User(val name: String, val email: String, val location: Location)
+```
 
 # AutoValue
-## Set It Up
+As said in the begginning, Google saved our sanity by creating this library with the help of some collaborators, let's have a look at it.
+
+## Seting It Up
+You will need to add the APT processor on your main build.gradle.
+
+```Project:Autovalues - build.gradle```
+```
+dependencies {
+    classpath 'com.android.tools.build:gradle:2.1.0'
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+```
+
+Then add the library to your app/build.gradle. Take care to add the auto-value-annotations from Jake Wharton to avoid leaking the whole annotation processors into our classpath. 
+
+```Module:app - build.gradle```
+```
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+  apt 'com.google.auto.value:auto-value:1.2'
+  provided 'com.jakewharton.auto.value:auto-value-annotations:1.2-update1'
+  apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.1'
+  apt 'com.ryanharter.auto.value:auto-value-gson:0.2.5'
+}
+```
 
 ## Simple Example
  livetemplate create
@@ -179,6 +258,7 @@ livetemplate typeAdapter
   [ImmutableObjectThreadSafeTy]:http://c2.com/cgi/wiki?ValueObjectsShouldBeImmutable
   [RHarterIntroAutoValue]:http://ryanharter.com/blog/2016/03/22/autovalue/
   [RHarterCreateExtentions]:http://ryanharter.com/blog/2016/04/08/autovalue-deep-dive/
+  [kotlinDataClass]:https://kotlinlang.org/docs/reference/data-classes.html
   
   
   Sources:  

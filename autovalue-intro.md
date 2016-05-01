@@ -1,5 +1,5 @@
 # AutoValue
-[AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1 on January 2015. His goal was to generate immutable value classes for Java 1.6 (for our dear Android developers blocked on Java 6) and to avoid to write all the boiler plate code. But what is a value object class?
+[AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1.0 on January 2015. His goal is to generate immutable value classes for Java 1.6 (for us, poor Android developers blocked on Java 6) and to avoid to write all the boiler plate code. But what is a value object class?
 
 ## Java Value Objects
 
@@ -64,7 +64,7 @@ task2.delay(5);
 # Writing an immutable class is (not) fun
  *Ryan Harter, one of the contributors of the AutoValue library have written good posts on [introducing AutoValue][RHarterIntroAutoValue] and [creating extensions][RHarterCreateExtentions] for this library that you have to read if you want to learn more about it.*
 
-But let's see what an immutable class needs to exist
+But let's see what an immutable class needs for existing.
 
 ## Base class
 Let's start by creating a User class with his name, email and location. We have 5 Lines of code.
@@ -187,7 +187,7 @@ public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<Us
 ```
 
 ## toString
-For aesthetics, and at this point of we can definitely add a little ```toString()``` to display a human readable object for your logs or debugging session by example. What's the score now? 78 lines. Not that bad for only one object.
+For aesthetics, and at this point of we can definitely add a bit more code. ```toString()``` methods exists to display a human readable object for your logs or debugging session by example. What's the score now? 78 lines. Not that bad for only one object.
 
 ```java
 @Override
@@ -211,7 +211,7 @@ data class User(val name: String, val email: String, val location: Location)
 # AutoValue
 As said in the begginning, Google saved our sanity by creating this library with the help of some collaborators. A very good job have been done on the documentation. It's the [best documented library][autoValueDoc] I have ever used.
 
-## Seting It Up
+## Setting It Up
 You will need to add the APT processor on your main build.gradle.
 
 ```Project:Autovalues - build.gradle```

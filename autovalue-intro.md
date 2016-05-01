@@ -1,3 +1,5 @@
+Written for the blog [dubedout.eu](http://dubedout.eu), let me know if you want to use this material.
+
 # AutoValue
 [AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1.0 on January 2015. His goal is to generate immutable value classes for Java 1.6 (for us, poor Android developers blocked on Java 6) and to avoid to write all the boiler plate code. But what is a value object class?
 

@@ -12,6 +12,8 @@ From the Oracle documentation on Java 8 we can find that a [value type class][Va
 - do not have accessible constructors but are instantiated through factory methods which make no commitment as to identity of returned instances,
 
 ## What's identity
+**(identity is not clear, use more instance, reference)**
+
 Identity is what I used to name reference id. An object instance have an id that can be shared around. Whenever this object is modified, all the other variable pointing to this id will get the modifications.
 
 In Java we can verify that two objects points are the same instance by using the operator ```==```. On the other side, the ```equals()``` is normally used for a comparison on the  object's values (as shown on the example below).
@@ -281,14 +283,6 @@ public abstract class User implements Parcelable { [...] }
 ```
 
 
-## Builder
-
-
-## Factory
-
-
-
-
 ## Gson
 gradle
 
@@ -297,6 +291,9 @@ apt 'com.ryanharter.auto.value:auto-value-gson:0.2.5'
 ### SerializableName('')
 
 livetemplate typeAdapter
+
+## Builder (next blog post)
+## Factory (next blog post)
 
   <!-- Article references -->
   [AutoValueLibrary]:https://github.com/google/auto/blob/master/value/userguide/index.md

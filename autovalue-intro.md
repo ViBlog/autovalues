@@ -63,7 +63,7 @@ task2.delay(5);
 ```
 
 # Writing an immutable class is (not) fun
- *Ryan Harter, one of the contributors of the AutoValue library have written good posts on [introducing AutoValue][RHarterIntroAutoValue] and [creating extensions][RHarterCreateExtentions] for this library that you have to read if you want to learn more about it.*
+ *Ryan Harter, one of the contributors of the AutoValue library have written good posts on [introducing AutoValue][RHarterIntroAutoValue] and [creating extensions][RHarterCreateExtentions] for this library that you should read if you want to learn more about it.*
 
 But let's see what an immutable class needs for existing.
 
@@ -279,6 +279,9 @@ public abstract class User implements Parcelable {
   [...] 
 }
 ```
+
+# Conclusion
+AutoValue library comes with nearly 9k methods, so if the 65k methods limit of Android is not a problem for you, I recommend it highly. It's very easy to use, increase your code readability, writing and maintenance, while helping you keeping your multithreaded code easy to fix thanks to the immutability. Recently I had to go back to some code I wrote 6 months ago where I wrote a 150 lines class with builder. I changed it using AutoValue and was able to squish everthing in less than 40. My scrolling finger thanked me ;)
 
   <!-- Article references -->
   [AutoValueLibrary]:https://github.com/google/auto/blob/master/value/userguide/index.md

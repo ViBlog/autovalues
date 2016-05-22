@@ -1,7 +1,7 @@
 Written for the blog [dubedout.eu](http://dubedout.eu), let me know if you want to use this material.
 
 # AutoValue
-[AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1.0 on January 2015. His goal is to generate immutable value classes for Java 1.6 (for us, poor Android developers blocked on Java 6) and to avoid to write all the boiler plate code. But what is a value object class?
+[AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1.0 on January 2015. His goal is to generate immutable value classes, backwards compatible with Java 1.6, and to avoid to write all the boiler plate code. But what is a value object class?
 
 ## Java Value Objects
 
@@ -12,11 +12,9 @@ From the Oracle documentation on Java 8 we can find that a [value type class][Va
 - do not have accessible constructors but are instantiated through factory methods which make no commitment as to identity of returned instances,
 
 ## What's identity
-**(identity is not clear, use more instance, reference)**
+Object identity is the instance id or reference. When you write ```someObject = originObject```, you are sharing the instance of originObject in someObject. If you modify someObject, it's actually originObject that you are modifying (does not apply for primitives).
 
-Identity is what I used to name reference id. An object instance have an id that can be shared around. Whenever this object is modified, all the other variable pointing to this id will get the modifications.
-
-In Java we can verify that two objects points are the same instance by using the operator ```==```. On the other side, the ```equals()``` is normally used for a comparison on the  object's values (as shown on the example below).
+In Java we can verify that two objects are the same instance by using the operator ```==```. On the other side, the ```equals()``` is normally used for a comparison on the  object's values (as shown on the example below).
 
 ```java
 @Test
@@ -28,7 +26,7 @@ public void testStringIdentity() {
     // Comparison on identity, object 2 has not the same reference id than object 1
     assertThat(object1 == object2).isFalse(); 
     
-    // Comparison on identity, object3 has the same reference id than object2
+    // Comparison on identity, object3 has the same reference id than object 2
     assertThat(object2 == object3).isTrue(); 
     
     // Comparison on value, this assertion is valid too
@@ -71,7 +69,7 @@ task2.delay(5);
 But let's see what an immutable class needs for existing.
 
 ## Base class
-Let's start by creating a User class with his name, email and location. We have 5 Lines of code.
+Let's start by creating a User class with his name, email and location: 5 Lines of code.
 
 ```java
 public class User {
@@ -83,7 +81,7 @@ public class User {
 
 ## Immutability
 
-We want this instance's values to be immutable so we use the ```private final``` to avoid them to be re-assigned. Same for the class that needs to not be subclass-able. We have to add a constructor
+We want instance's values to be immutable. We use an access modifier ```private final``` to avoid the objects to be re-assigned. Same for the class that needs not to be subclass-able. Finally, we have to add a constructor.
 
 ```java
 public final class User {
@@ -99,10 +97,8 @@ public final class User {
 }
 ```
 
-That's 10 lines.
-
 ## Getters
-To access the instance's values we have to create getters. Let's add 9 more lines to make it 19 in total.
+To access the instance's values we have to create getters. 
 
 ```java
 [...]
@@ -119,7 +115,8 @@ private Location getLocation() {
 }
 [...]
 ```
-On a side note, if you return a mutable object in the getter, Java will return the reference to the object. Doing so, this object will be able to be modified breaking the advantages of the Immutability. To avoid that you will have to return a clone of the object. You should also take care of the memory cost of doing so. Not much more choices there, choose carefully.
+
+On a side note, if you return a Mutable Object in the getter, Java will return his reference. Doing so, you will be able to be modify it breaking the advantages of the Immutability. To avoid that you will have to return a clone of the object. You should also take care of the memory cost of doing so. Not much more choices there, choose carefully.
 
 ```java
 private Location getLocation() {
@@ -128,7 +125,7 @@ private Location getLocation() {
 ```
 
 ## Hashcode() & Equals()
-To handle the equals by values and not by reference we have to generate the equals() and hashcode(). As with the getters, IntelliJ is a good software and let's you generate this code by using ```Ctrl+Enter``` (mac). Unfortunately you will have to never forget to delete and redo it each time you add a new variable else it will forget to compare the new ones. Not really mistake proof. Ow, and that's 22 more lines. 41 lines now...
+To handle the equals by values and not by reference we have to generate the equals() and hashcode(). As with the getters, IntelliJ is a good software and let's you generate this code by using ```Ctrl+Enter``` (mac). Unfortunately you will have to never forget to delete and redo it each time you add a new variable. Not really mistake proof. Ow, and that's 22 more lines. 41 lines now...
 
 ```java
 @Override
@@ -191,7 +188,7 @@ public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<Us
 ```
 
 ## toString
-For aesthetics, and at this point of we can definitely add a bit more code. ```toString()``` methods exists to display a human readable object for your logs or debugging session by example. What's the score now? 78 lines. Not that bad for only one object.
+For aesthetics, we can add a bit more code. ```toString()``` methods exists to display a human readable object for your logs or debugging session by example. What's the score now? 78 lines. Not that bad for only one object and three fields.
 
 ```java
 @Override

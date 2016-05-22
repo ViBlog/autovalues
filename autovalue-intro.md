@@ -201,7 +201,7 @@ public String toString() {
 }
 ```
 ## Half way conclusion
-We had to write and generate 78 lines to create a Java Value Object. From those we will have to take care to modify 30% of them if we add or delete a new variable. It's a mistake that can cause problems and are difficult to debug because we tend to slip over those methods without really reading them.
+We had to write and generate 78 lines to create a Three Fields Value Object. We will have to take care to modify 30% of the code if we add or delete a new variable. It's a mistake that can cause problems and are difficult to debug because we tend to slip over those methods without really reading them.
 
 On a side note, we can create this kind of class easily in kotlin by using a [data class][kotlinDataClass]. (Parcelable will not be part of the deal though)
 
@@ -235,7 +235,7 @@ dependencies {
 ```
 
 ## Simple Example
-So this is what we have to write to have the same class as above but without the Parcelable. 9 lines... I trully think that's awesome. 
+So this is what we have to write to have the same class as above (without the Parcelable). 9 lines... I trully think that's awesome. 
 
 ```java
 @AutoValue
@@ -250,10 +250,10 @@ public abstract class User {
 }
 ```
 
-As the time of writting this, I'm working on a new project for the Montreal Agency [Tractr][tractr] and I have created dozens of those objects for the API Client and it saved me a lot of time and probably headaches with the immutability way.
+As the time of writting this, I'm working on a new project for the Montreal Agency [Tractr][tractr] and I have created dozens of those objects for the API Client and it saved me a lot of time and headaches using immutability.
 
 ### Create object live template
-When creating those object I often had trouble while writing the creator because the AutoValue_class was not yet generated. To avoid typos, I created this little live template to help. If you find a way to add the abstract methods directly in it, let me know.
+When creating those object I often had trouble while writing the creator because the AutoValue_class was not yet generated. To avoid typos, I created this little live template to help. If you find a way to add the abstract methods directly in the constructor, let me know.
 
 ```java
 public static $class$ create($parameters$) {
@@ -276,21 +276,10 @@ dependencies {
 
 Make the User implement Parcelable and here we go, our class generated will handle it. No more code needed.
 ```java 
-public abstract class User implements Parcelable { [...] }
+public abstract class User implements Parcelable { 
+  [...] 
+}
 ```
-
-
-## Gson
-gradle
-
-
-apt 'com.ryanharter.auto.value:auto-value-gson:0.2.5'
-### SerializableName('')
-
-livetemplate typeAdapter
-
-## Builder (next blog post)
-## Factory (next blog post)
 
   <!-- Article references -->
   [AutoValueLibrary]:https://github.com/google/auto/blob/master/value/userguide/index.md
@@ -303,7 +292,6 @@ livetemplate typeAdapter
   [kotlinDataClass]:https://kotlinlang.org/docs/reference/data-classes.html
   [autoValueDoc]:https://github.com/google/auto/blob/master/value/userguide/index.md
   [tractr]:http://tractr.net/
-  
   
   <!-- Images -->
   [liveTemplateCreate]:images/liveTemplateCreate.png

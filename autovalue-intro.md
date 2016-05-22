@@ -1,7 +1,7 @@
 Written for the blog [dubedout.eu](http://dubedout.eu), let me know if you want to use this material.
 
 # AutoValue
-[AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1.0 on January 2015. His goal is to generate immutable value classes, backwards compatible with Java 1.6, and to avoid to write all the boiler plate code. But what is a value object class?
+[AutoValue][AutoValueLibrary] is a Java library created by Google and released as version 1.0 on January 2015. His goal is to generate immutable value classes, backwards compatible with Java 1.6, and avoid to write all the boiler plate code. But what is a value object class?
 
 ## Java Value Objects
 
@@ -12,9 +12,9 @@ From the Oracle documentation on Java 8 we can find that a [value type class][Va
 - do not have accessible constructors but are instantiated through factory methods which make no commitment as to identity of returned instances,
 
 ## What's identity
-Object identity is the instance id or reference. When you write ```someObject = originObject```, you are sharing the instance of originObject in someObject. If you modify someObject, it's actually originObject that you are modifying (does not apply for primitives).
+Object identity is the instance id or reference. When you write ```someObject = originObject```, you are sharing the instance of ```originObject``` in ```someObject```. If you modify ```someObject```, it's actually ```originObject``` that you are modifying (does not apply for primitives).
 
-In Java we can verify that two objects are the same instance by using the operator ```==```. On the other side, the ```equals()``` is normally used for a comparison on the  object's values (as shown on the example below).
+In Java we can verify that two objects are from the same instance by using the operator ```==```. On the other side, the ```equals()``` is normally used for a comparison on the  object's values (as shown on the example below).
 
 ```java
 @Test
@@ -48,10 +48,9 @@ So let's do it... Well, not so fast, why we should do this?
 - they allow hashCode to use lazy initialization, and cache its return value as it will never change
 - make good Map keys and Set elements (these objects must not change state while in the collection)
 
-As Martin Fowler show us with his [little example below][ImmutableObjectThreadSafeTy], thread safety is a serious problem that can be avoided simply by using immutable objects.  
+As Martin Fowler show us with his [little example][ImmutableObjectThreadSafeTy], thread safety is a serious problem that can be avoided simply by using immutable objects.  
 
-<!-- Put back ```java when done -->
-```
+```java
 task1.setStartDate(new Date("1 Jan 98");
 task2.setStartDate(task1.getTaskDate());
 //then somewhere in the task class

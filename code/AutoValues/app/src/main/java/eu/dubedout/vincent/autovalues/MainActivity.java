@@ -52,21 +52,25 @@ public class MainActivity extends AppCompatActivity {
 
         final StringBuilder results = new StringBuilder();
 
-        long durationWithoutAutoValue = getDeserializationWithoutAutoValueDuration(loopNumber);
-        results.append("Without factory:"+durationWithoutAutoValue+"ms ");
+        float durationWithoutAutoValue = getDeserializationWithoutAutoValueDuration(loopNumber);
+        results.append("Reflection: "+durationWithoutAutoValue+"ms ");
 
-        long durationAutoValued = getDeserializationAutoValuedDuration(loopNumber);
-        results.append("| With factory:"+durationAutoValued+"ms ");
-
+        float durationAutoValued = getDeserializationAutoValuedDuration(loopNumber);
+        results.append("| With Factory: "+durationAutoValued+"ms ");
+        results.append("\n--> "+ getDurationSpeedInPercent(durationWithoutAutoValue, durationAutoValued) + "% speed\n");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                textView.setText(results.toString());
+                textView.setText(results.toString() + textView.getText());
             }
         });
     }
 
-    private long getDeserializationWithoutAutoValueDuration(int loopNumber) {
+    private float getDurationSpeedInPercent(float durationWithoutAutoValue, float durationAutoValued) {
+        return Math.round(durationWithoutAutoValue /  durationAutoValued * 100f);
+    }
+
+    private float getDeserializationWithoutAutoValueDuration(int loopNumber) {
         Log.d(TAG, "onCreate: start basic deserialization");
 
         long startTimer = System.currentTimeMillis();
@@ -77,14 +81,14 @@ public class MainActivity extends AppCompatActivity {
             List<UserDetailWithoutAutoValue> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
         }
 
-        long totalDuration = System.currentTimeMillis() - startTimer;
+        float totalDuration = System.currentTimeMillis() - startTimer;
 
         Log.d(TAG, "onCreate: end basic deserialization. Duration="+totalDuration);
 
         return totalDuration;
     }
 
-    private long getDeserializationAutoValuedDuration(int loopNumber) {
+    private float getDeserializationAutoValuedDuration(int loopNumber) {
         Log.d(TAG, "onCreate: start autovalue deserialization");
 
         long startTimer = System.currentTimeMillis();
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             List<UserDetailAutoValued> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
         }
 
-        long totalDuration = System.currentTimeMillis() - startTimer;
+        float totalDuration = System.currentTimeMillis() - startTimer;
 
         Log.d(TAG, "onCreate: end autovalue deserialization. Duration="+totalDuration);
 

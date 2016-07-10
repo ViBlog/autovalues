@@ -1,4 +1,6 @@
-As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that help us to avoid writing all the boiler plate of value objects. A great thing is that it's possible to create extensions for this library like [AutoValue-Gson from Ryan Harter][auto-value-gson]. We will see what we can do with it.
+# How to divide by 2 your Json parsing time while coding less.
+
+As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that help us to avoid writing all the boiler plate of value objects. A great thing is that it's possible to create extensions for it and [AutoValue-Gson from Ryan Harter][auto-value-gson] is a great example on how to simplify your developpers life.
 
 # Setup your build.gradle
 First you need to setup your build.gradle files.
@@ -7,7 +9,7 @@ root/build.gradle
 ```
 buildscript {
   dependencies {
-    //[...]
+    //[...] 
     classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
   }
 }
@@ -22,7 +24,7 @@ dependencies {
 }
 ```
 
-If you encounter ```java.lang.NoSuchMethodError: com.squareup.javapoet.TypeName.isBoxedPrimitive()Z``` while compiling. It means that gradle is not able to resolve the correct JavaPoet version. Add ```apt 'com.squareup:javapoet:1.7.0'``` before your Dagger apt and it should solve it. ***Link to issue***
+If you encounter ```java.lang.NoSuchMethodError: com.squareup.javapoet.TypeName.isBoxedPrimitive()Z``` while compiling. It means that gradle is not able to resolve the correct JavaPoet version. Add ```apt 'com.squareup:javapoet:1.7.0'``` before your Dagger apt and it should solve it. 
 
 # Create your object
 Let's create a little dummy object.
@@ -86,7 +88,7 @@ public static TypeAdapter<$class$> typeAdapter(Gson gson) {
 
 ## Pre-0.3.0, create the AutoValueGsonTypeAdapterFactory
 
-If you are using a version before 0.3.0 you will need to create a Type Adapter Factory. 
+If you are using a version before 0.3.0 you will need to create a Type Adapter Factory (or update, make yourself a favor, do it)
 
 ```java
 public class AutoValueGsonTypeAdapterFactory implements TypeAdapterFactory {
@@ -103,9 +105,9 @@ public class AutoValueGsonTypeAdapterFactory implements TypeAdapterFactory {
 }
 ```
 
-# Parsing stored json
+# Parsing JSON
 ## Dummy json
-I've created some data using the website [http://www.json-generator.com/]
+I've created some data using the website http://www.json-generator.com
 
 ```java
 public class DummyJsonProvider {
@@ -125,7 +127,7 @@ public class DummyJsonProvider {
             "    \"address\": \"923 Calyer Street, Toftrees, Oklahoma, 2959\",\n" +
             "    \"about\": \"Consectetur dolor sit duis laboris incididunt non ex qui. Dolore cillum Lorem consectetur consequat sint id amet ullamco pariatur irure. Elit amet eu occaecat qui ad. Ex amet mollit commodo reprehenderit eiusmod. Laboris ad irure consectetur eiusmod excepteur tempor consequat incididunt mollit aliquip consectetur nulla.\\r\\n\"\n" +
             "  },\n";
-            // * 50 static random data
+            // x50 static random data
 }
 ```
 
@@ -139,7 +141,7 @@ for (int i = 0; i < loopNumber; i++) {
 }
 ```
 
-### Without reflection (aka auto-value-gson factory)
+### Without reflection (using the auto-value-gson factory)
 ```java
 Gson gson = new GsonBuilder()
         .registerTypeAdapterFactory(new AutoValueGsonTypeAdapterFactory())
@@ -151,27 +153,45 @@ for (int i = 0; i < loopNumber; i++) {
 ```
 
 ## Comparison parsing reflection vs without
+I wrote a little app to test the difference. You can find it on [this autovaluevalue github project][self-autovalue-project].
 
-10 loops duration with and without reflection in ms  
+Here I deserialize using the gson reflection, 
+```java
+long startTimer = System.currentTimeMillis();
+
+Gson gson = new GsonBuilder().create();
+Type type = new TypeToken<ArrayList<UserDetailWithoutAutoValue>>() {}.getType();
+for (int i = 0; i < loopNumber; i++) {
+    List<UserDetailWithoutAutoValue> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
+}
+
+float totalDuration = System.currentTimeMillis() - startTimer;
+```
+
+and I compare against the one with the AutoValue Adapter Factory.
+```java
+long startTimer = System.currentTimeMillis();
+
+Gson gson = new GsonBuilder()
+        .registerTypeAdapterFactory(new AutoValueGsonTypeAdapterFactory())
+        .create();
+Type type = new TypeToken<ArrayList<UserDetailAutoValued>>() {}.getType();
+for (int i = 0; i < loopNumber; i++) {
+    List<UserDetailAutoValued> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
+}
+
+float totalDuration = System.currentTimeMillis() - startTimer;
+```
+
+Then I write the number of loops I want to test in the UI and here we go.
+
+![Compare-reflection-vs-not][comparison-reflection-vs-not]
+
+As you can see in the image above, we can see that our (not) scientific test result show an, at least, 200% time decrease for the deserialization.
 
 
-| with reflection  |  with GsonConverterFactory  |
-| --- | --- |
-| 1384 | 456 |
-| 1432 | 373 |
-| 1386 | 531 |
-| 1325 | 287 |
-| 1307 | 560 |
-| 1611 | 575 |
-| 1148 | 424 |
-
-~66% faster to use autovalue deserialization
-
-
-# Using it with Retrofit 
+# Bonus: Using it with Retrofit 
 ## Gson converter 
-Create your GsonConverterFactory
-
 ```java
 GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(
         new GsonBuilder()
@@ -188,13 +208,18 @@ Retrofit retrofit = new Retrofit
         .build()
 ```
 
-
+# Conclusion
+We have seen here that by using AutoValue and the Gson Extension, we can reduce a lot the time needed to parse json files. It can be very useful when your app depends this kind of format. I've been using it for the last three months, and object creation is just so easy that I have to take care to not create another object instead of using an existing one.  
+  
+On a side note, you should use the Parcelable extension too... Add "implements Parcelable" and here you go.
 
 <!-- Images -->
 [livetemplate]: images/autovalue-gson-typeadapter.png
 [livetemplate_animated]: images/livetemplate_typeadapter.gif
+[comparison-reflection-vs-not]: images/comparison-reflection-vs-not.png
 
 
 <!-- Links -->
 [autovalue-dubedout]: http://dubedout.eu/2016/05/22/google-autovalue-immutability/
 [auto-value-gson]: https://github.com/rharter/auto-value-gson
+[self-autovalue-project]: https://github.com/ViBlog/autovalues/tree/master/code/AutoValues

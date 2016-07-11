@@ -1,9 +1,9 @@
-# How to divide by 2 your Json parsing time while coding less.
+# Divide by two your JSON parsing time
 
-As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that help us to avoid writing all the boiler plate of value objects. A great thing is that it's possible to create extensions for it and [AutoValue-Gson from Ryan Harter][auto-value-gson] is a great example on how to simplify your developpers life.
+As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that helps us to avoid writing all the boilerplate of value objects. The great thing is that it's possible to create extensions for it and [AutoValue-Gson from Ryan Harter][auto-value-gson] is a great example on how to simplify your developer's life.
 
 # Setup your build.gradle
-First you need to setup your build.gradle files.
+First, you need to setup your build.gradle files.
 
 root/build.gradle
 ```
@@ -67,7 +67,7 @@ public abstract class UserDetail {
 }
 ```
 
-Now the AutoValue Gson will be able to generate all the code needed to serialize deserialize the object for us.
+Now the AutoValue Gson will be able to generate all the code needed to serialize and deserialize the object for us.
 
 ## Android Studio live template
 
@@ -88,7 +88,7 @@ public static TypeAdapter<$class$> typeAdapter(Gson gson) {
 
 ## Pre-0.3.0, create the AutoValueGsonTypeAdapterFactory
 
-If you are using a version before 0.3.0 you will need to create a Type Adapter Factory (or update, make yourself a favor, do it)
+If you are using a version before 0.3.0, you will need to create a Type Adapter Factory (or update, make yourself a favor, do it)
 
 ```java
 public class AutoValueGsonTypeAdapterFactory implements TypeAdapterFactory {
@@ -106,7 +106,7 @@ public class AutoValueGsonTypeAdapterFactory implements TypeAdapterFactory {
 ```
 
 # Parsing JSON
-## Dummy json
+## Dummy file
 I've created some data using the website http://www.json-generator.com
 
 ```java
@@ -152,8 +152,8 @@ for (int i = 0; i < loopNumber; i++) {
 }
 ```
 
-## Comparison parsing reflection vs without
-I wrote a little app to test the difference. You can find it on [this autovaluevalue github project][self-autovalue-project].
+## Comparing parsing reflection vs. without
+I wrote a little app to test the difference. You can find it on [this AutoValue GitHub project][self-autovalue-project].
 
 Here I deserialize using the gson reflection, 
 ```java
@@ -183,7 +183,7 @@ for (int i = 0; i < loopNumber; i++) {
 float totalDuration = System.currentTimeMillis() - startTimer;
 ```
 
-Then I write the number of loops I want to test in the UI and here we go.
+Then I write the number of loops I want to test in the UI, and here we go.
 
 ![Compare-reflection-vs-not][comparison-reflection-vs-not]
 
@@ -199,7 +199,7 @@ GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(
                 .create());
 ```
 
-## Retrofit builder
+## Retrofit Builder
 ```java
 Retrofit retrofit = new Retrofit
         .Builder()
@@ -209,9 +209,11 @@ Retrofit retrofit = new Retrofit
 ```
 
 # Conclusion
-We have seen here that by using AutoValue and the Gson Extension, we can reduce a lot the time needed to parse json files. It can be very useful when your app depends this kind of format. I've been using it for the last three months, and object creation is just so easy that I have to take care to not create another object instead of using an existing one.  
+We have seen here that by using AutoValue and the Gson Extension, we can reduce a lot the time needed to parse JSON files. It can be very useful when your app depends on this kind of format. I've been using it for the last three months, and object creation is just so easy that I have to take care not to create another object instead of using an existing one.  
   
 On a side note, you should use the Parcelable extension too... Add "implements Parcelable" and here you go.
+
+PS: [Spiral Clock][SpiralClock] by cat-machine, [Creative Commons Attribution-Noncommercial-Share Alike 3.0 License][creative-commons]
 
 <!-- Images -->
 [livetemplate]: images/autovalue-gson-typeadapter.png
@@ -223,3 +225,5 @@ On a side note, you should use the Parcelable extension too... Add "implements P
 [autovalue-dubedout]: http://dubedout.eu/2016/05/22/google-autovalue-immutability/
 [auto-value-gson]: https://github.com/rharter/auto-value-gson
 [self-autovalue-project]: https://github.com/ViBlog/autovalues/tree/master/code/AutoValues
+[SpiralClock]: http://cat-machine.deviantart.com/art/Spiral-Clock-1-110993506
+[creative-commons]: https://creativecommons.org/licenses/by-nc-sa/3.0/

@@ -1,6 +1,12 @@
 # Divide by two your JSON parsing time
 
-As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that helps us to avoid writing all the boilerplate of value objects. The great thing is that it's possible to create extensions for it and [AutoValue-Gson from Ryan Harter][auto-value-gson] is a great example on how to simplify your developer's life.
+Few years ago, when Android started we had to parse JSON APIs by hand, it wasn't as worse as parsing the XML but it was a boring and long task. Then some (De)Serializers were created or imported from java to Android: Gson, Jackson... Most of them were using reflection to transform JSON into an object and vice-versa... No more boring task or code to change everywhere when something changed in the API but at the cost of performance. Reflection is a heavy process and if you use it to parse numerous files it can slow your app. So we had to consider performance cost vs time to code.  
+
+>"Performance cost" versus "time to code" is not a choice we have to do anymore.
+
+As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that helps us to avoid writing all the boilerplate of value objects. The great thing is that it's possible to create extensions for it and [AutoValue-Gson from Ryan Harter][auto-value-gson] is a great example on how to simplify your developer's life. It will generate for you the custom type adapters you need.
+
+It means that you can use the power of your JSON serializers without impact in your app performance, while staying very simple to use. 
 
 # Setup your build.gradle
 First, you need to setup your build.gradle files.
@@ -26,16 +32,42 @@ dependencies {
 
 If you encounter ```java.lang.NoSuchMethodError: com.squareup.javapoet.TypeName.isBoxedPrimitive()Z``` while compiling. It means that gradle is not able to resolve the correct JavaPoet version. Add ```apt 'com.squareup:javapoet:1.7.0'``` before your Dagger apt and it should solve it. 
 
-# Create your object
-Let's create a little dummy object.
+# JSON file
+To be able to test, I've created data we will play with. You can do the same by using the website http://www.json-generator.com. It's an array with 50 objects. 
+
+```java
+public class DummyJsonProvider {
+    public static String DUMMY_JSON = "[\n" +
+            "  {\n" +
+            "    \"_id\": \"576869ed835bc5884bf7179e\",\n" +
+            "    \"index\": 0,\n" +
+            "    \"guid\": \"5f4b447c-4911-4ee2-bdc4-8d71c7f2a6d4\",\n" +
+            "    \"picture\": \"http://placehold.it/32x32\",\n" +
+            "    \"age\": 31,\n" +
+            "    \"eyeColor\": \"green\",\n" +
+            "    \"name\": \"Gwendolyn Riggs\",\n" +
+            "    \"gender\": \"female\",\n" +
+            "    \"company\": \"XOGGLE\",\n" +
+            "    \"email\": \"gwendolynriggs@xoggle.com\",\n" +
+            "    \"phone\": \"+1 (983) 458-3698\",\n" +
+            "    \"address\": \"923 Calyer Street, Toftrees, Oklahoma, 2959\",\n" +
+            "    \"about\": \"Consectetur dolor sit duis laboris incididunt non ex qui. Dolore cillum Lorem consectetur consequat sint id amet ullamco pariatur irure. Elit amet eu occaecat qui ad. Ex amet mollit commodo reprehenderit eiusmod. Laboris ad irure consectetur eiusmod excepteur tempor consequat incididunt mollit aliquip consectetur nulla.\\r\\n\"\n" +
+            "  },\n";
+            // x50 static random data
+}
+```
+
+# Create your object to match the JSON
+Now, as usual we create the object matching the JSON. You can see a ```@Nullable``` here, this annotation is very usefull if there is mandatory field. If you field is a primitive, you will have to use his object equivalent int -> Integer, bool -> Boolean etc...
+
 ```java
 @AutoValue
 public abstract class UserDetail {
     public abstract String picture();
     public abstract int age();
-    public abstract EyeColor eyeColor();
+    public abstract EyeColor eyeColor(); // enum
     public abstract String name();
-    public abstract String gender();
+    @Nullable public abstract String gender();
     public abstract String company();
     public abstract String email();
     public abstract String phone();
@@ -44,7 +76,7 @@ public abstract class UserDetail {
 }
 ```
 
-To be able to use the @SerializedName you will need to add ```compile 'com.google.code.gson:gson:2.6.2'``` to your build.gradle
+To be able to use the ```@SerializedName``` you will need to add ```compile 'com.google.code.gson:gson:2.6.2'``` to your build.gradle. ```@SerializedName("value")``` let you rename the JSON field // continue here
 ```java
 public enum EyeColor {
     @SerializedName("blue") BLUE,
@@ -52,7 +84,7 @@ public enum EyeColor {
     @SerializedName("green") GREEN
 }
 ```
-
+***Explain serializedName goal***
 The extension needs a public static method that returns a TypeAdapter. Let's add it to UserDetail.
 
 ```java

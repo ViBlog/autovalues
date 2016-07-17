@@ -1,12 +1,12 @@
 # Divide by two your JSON parsing time
 
-Few years ago, when Android started we had to parse JSON APIs by hand, it wasn't as worse as parsing the XML but it was a boring and long task. Then some (De)Serializers were created or imported from java to Android: Gson, Jackson... Most of them were using reflection to transform JSON into an object and vice-versa... No more boring task or code to change everywhere when something changed in the API but at the cost of performance. Reflection is a heavy process and if you use it to parse numerous files it can slow your app. So we had to consider performance cost vs time to code.  
+A few years ago, when Android started we had to parse JSON APIs by hand, it wasn't as worse as parsing the XML, but it was a tedious and long task. Then some (De)Serializers were created or imported from Java to Android: Gson, Jackson... Most of them were using reflection to transform JSON into an object and vice-versa... No more boring task or code to change everywhere when something changed in the API but at the cost of performance. Reflection is a heavy process, and if you use it to parse numerous files, it can slow your app. So we always had to consider performance cost vs. time to code.  
 
 >"Performance cost" versus "time to code" is not a choice we have to do anymore.
 
 As seen previously, [AutoValue][autovalue-dubedout] is a library written by Google that helps us to avoid writing all the boilerplate of value objects. The great thing is that it's possible to create extensions for it and [AutoValue-Gson from Ryan Harter][auto-value-gson] is a great example on how to simplify your developer's life. It will generate for you the custom type adapters you need.
 
-It means that you can use the power of your JSON serializers without impact in your app performance, while staying very simple to use. 
+It means that you can use the power of your JSON serializers without impact in your app performance while staying very simple to use. 
 
 # Using AutoValue Gson extension
 ## Setup your build.gradle
@@ -34,7 +34,7 @@ dependencies {
 If you encounter ```java.lang.NoSuchMethodError: com.squareup.javapoet.TypeName.isBoxedPrimitive()Z``` while compiling. It means that gradle is not able to resolve the correct JavaPoet version. Add ```apt 'com.squareup:javapoet:1.7.0'``` before your Dagger apt and it should solve it. 
 
 ## JSON file
-To be able to test, I've created data we will play with. You can do the same by using the website http://www.json-generator.com. It's an array with 50 objects. 
+To be able to test, I've created data we will use. You can do the same by using the website http://www.json-generator.com. It's an array of 50 objects. 
 
 ```java
 public class DummyJsonProvider {
@@ -59,7 +59,7 @@ public class DummyJsonProvider {
 ```
 
 ## Create your object to match the JSON
-Now, as usual we create the object matching the JSON. 
+Now, as usual, we create the object matching the JSON. 
 
 ```java
 @AutoValue
@@ -77,7 +77,7 @@ public abstract class UserDetail {
 }
 ```
 
-You can see a ```@Nullable``` here, this annotation is used when there is a mandatory field. If the field in your JSON don't exist, you will get a null instead of a crash. But you have to change your object to a nullable one. If it's a primitive, you will have to use his object equivalent int -> Integer, bool -> Boolean etc...
+You can see a ```@Nullable``` here, this annotation is used when there is a mandatory field. If the field in your JSON doesn't exist, you will get a null instead of a crash. However, you have to change your object to a nullable one. If it's a primitive, you will have to use his object equivalent int -> Integer, bool -> Boolean, etc...
 
 ```java
 public enum EyeColor {
@@ -87,7 +87,7 @@ public enum EyeColor {
 }
 ```
 
-```@SerializedName``` is another annotation that let you map your object name to the JSON field name. Let's say my JSON field is ```"is_bold":true```, to be able to match with your object name you will have to write it like this ```public abstract boolean is_bold()```. Unfortunately, it's not following the camelCase convention. The solution is writte it like this: ```@SerializedName("is_bold") public abstract boolean isThisCamelBold()```. It's clearly more camelCase friendly.
+```@SerializedName``` is another annotation that let you map your object name to the JSON field name. Let's say my JSON field is ```"is_bold":true```, to be able to match with your object name you will have to write it like this ```public abstract boolean is_bold()```. Unfortunately, it's not following the camelCase convention. The solution is writing it like this: ```@SerializedName("is_bold") public abstract boolean isThisCamelBold()```. It's clearly more camelCase friendly.
 
 
 ## TypeAdapter
@@ -105,7 +105,7 @@ public abstract class UserDetail {
 }
 ```
 
-Now the extension will be able to generate the code needed to serialize and deserialize the object for us. Cool but I don't like to write this for everyobject...
+Now the extension will be able to generate the code needed to serialize and deserialize the object for us. Cool but I don't like to write this for every object...
 
 ## Android Studio live template
 
@@ -143,8 +143,10 @@ public class AutoValueGsonTypeAdapterFactory implements TypeAdapterFactory {
 }
 ```
 
-## Use the converter to get your object
-### With Reflection
+# GSON Serializer
+So, here we will compare two different ways to deserialize your JSON data. The first is the most used one, automatic deserialization versus the ```TypeAdapterFactory``` generated by AutoValue GSON.
+
+## With Reflection
 ```java
 Gson gson = new GsonBuilder().create();
 Type type = new TypeToken<ArrayList<UserDetailWithoutAutoValue>>() {}.getType();
@@ -153,7 +155,9 @@ for (int i = 0; i < loopNumber; i++) {
 }
 ```
 
-### Without reflection (using the auto-value-gson factory)
+## With Generated TypeAdapter (using the auto-value-gson factory)
+The difference with the previous one is that we register the generated ```AutoValueGsonTypeAdapterFactory``` in the ```GsonBuilder```.
+
 ```java
 Gson gson = new GsonBuilder()
         .registerTypeAdapterFactory(new AutoValueGsonTypeAdapterFactory())
@@ -165,41 +169,11 @@ for (int i = 0; i < loopNumber; i++) {
 ```
 
 ## Comparing parsing reflection vs. without
-I wrote a little app to test the difference. You can find it on [this AutoValue GitHub project][self-autovalue-project].
-
-Here I deserialize using the gson reflection, 
-```java
-long startTimer = System.currentTimeMillis();
-
-Gson gson = new GsonBuilder().create();
-Type type = new TypeToken<ArrayList<UserDetailWithoutAutoValue>>() {}.getType();
-for (int i = 0; i < loopNumber; i++) {
-    List<UserDetailWithoutAutoValue> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
-}
-
-float totalDuration = System.currentTimeMillis() - startTimer;
-```
-
-and I compare against the one with the AutoValue Adapter Factory.
-```java
-long startTimer = System.currentTimeMillis();
-
-Gson gson = new GsonBuilder()
-        .registerTypeAdapterFactory(new AutoValueGsonTypeAdapterFactory())
-        .create();
-Type type = new TypeToken<ArrayList<UserDetailAutoValued>>() {}.getType();
-for (int i = 0; i < loopNumber; i++) {
-    List<UserDetailAutoValued> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
-}
-
-float totalDuration = System.currentTimeMillis() - startTimer;
-```
-
-Then I write the number of loops I want to test in the UI, and here we go.
+I wrote some code to test the difference. I start a timer before and stop it after the deserialization and then, compare the two durations. Not a very scientific approach but it can give some overview. To finish, I launch the app, write the number of loops I want to test in the UI, and here we go. You can find it on [this AutoValue GitHub project][self-autovalue-project].
 
 ![Compare-reflection-vs-not][comparison-reflection-vs-not]
 
-As you can see in the image above, we can see that our (not) scientific test result show an, at least, 200% time decrease for the deserialization.
+So, by using the Type Adapter we gain from 200% to 400% speed. 
 
 
 # Bonus: Using it with Retrofit 
@@ -221,9 +195,9 @@ Retrofit retrofit = new Retrofit
 ```
 
 # Conclusion
-We have seen here that by using AutoValue and the Gson Extension, we can reduce a lot the time needed to parse JSON files. It can be very useful when your app depends on this kind of format. I've been using it for the last three months, and object creation is just so easy that I have to take care not to create another object instead of using an existing one.  
+We have seen here that by using AutoValue and the Gson Extension, we can reduce a lot the time needed to parse JSON files. It can be very useful when your app depends on this kind of format. I've been using it for the last three months, and object creation using AutoValue is just so easy that I have to take care not to create another object instead of using an existing one.  
   
-On a side note, you should use the Parcelable extension too... Add "implements Parcelable" and here you go.
+On a side note, you should use the Parcelable extension too. When you need it, just add "implements Parcelable" in your object, and AutoValue will generate it.
 
 PS: [Spiral Clock][SpiralClock] by cat-machine, [Creative Commons Attribution-Noncommercial-Share Alike 3.0 License][creative-commons]
 

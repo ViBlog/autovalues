@@ -8,7 +8,8 @@ As seen previously, [AutoValue][autovalue-dubedout] is a library written by Goog
 
 It means that you can use the power of your JSON serializers without impact in your app performance, while staying very simple to use. 
 
-# Setup your build.gradle
+# Using AutoValue Gson extension
+## Setup your build.gradle
 First, you need to setup your build.gradle files.
 
 root/build.gradle
@@ -32,7 +33,7 @@ dependencies {
 
 If you encounter ```java.lang.NoSuchMethodError: com.squareup.javapoet.TypeName.isBoxedPrimitive()Z``` while compiling. It means that gradle is not able to resolve the correct JavaPoet version. Add ```apt 'com.squareup:javapoet:1.7.0'``` before your Dagger apt and it should solve it. 
 
-# JSON file
+## JSON file
 To be able to test, I've created data we will play with. You can do the same by using the website http://www.json-generator.com. It's an array with 50 objects. 
 
 ```java
@@ -57,8 +58,8 @@ public class DummyJsonProvider {
 }
 ```
 
-# Create your object to match the JSON
-Now, as usual we create the object matching the JSON. You can see a ```@Nullable``` here, this annotation is very usefull if there is mandatory field. If you field is a primitive, you will have to use his object equivalent int -> Integer, bool -> Boolean etc...
+## Create your object to match the JSON
+Now, as usual we create the object matching the JSON. 
 
 ```java
 @AutoValue
@@ -67,7 +68,7 @@ public abstract class UserDetail {
     public abstract int age();
     public abstract EyeColor eyeColor(); // enum
     public abstract String name();
-    @Nullable public abstract String gender();
+    @Nullable public abstract String gender(); // nullable
     public abstract String company();
     public abstract String email();
     public abstract String phone();
@@ -76,7 +77,8 @@ public abstract class UserDetail {
 }
 ```
 
-To be able to use the ```@SerializedName``` you will need to add ```compile 'com.google.code.gson:gson:2.6.2'``` to your build.gradle. ```@SerializedName("value")``` let you rename the JSON field // continue here
+You can see a ```@Nullable``` here, this annotation is used when there is a mandatory field. If the field in your JSON don't exist, you will get a null instead of a crash. But you have to change your object to a nullable one. If it's a primitive, you will have to use his object equivalent int -> Integer, bool -> Boolean etc...
+
 ```java
 public enum EyeColor {
     @SerializedName("blue") BLUE,
@@ -84,8 +86,12 @@ public enum EyeColor {
     @SerializedName("green") GREEN
 }
 ```
-***Explain serializedName goal***
-The extension needs a public static method that returns a TypeAdapter. Let's add it to UserDetail.
+
+```@SerializedName``` is another annotation that let you map your object name to the JSON field name. Let's say my JSON field is ```"is_bold":true```, to be able to match with your object name you will have to write it like this ```public abstract boolean is_bold()```. Unfortunately, it's not following the camelCase convention. The solution is writte it like this: ```@SerializedName("is_bold") public abstract boolean isThisCamelBold()```. It's clearly more camelCase friendly.
+
+
+## TypeAdapter
+For AutoValue GSON extension to work it have to find a **static method** returning a ```TypeAdapter<Object>``` in your AutoValue class. So let's add it to UserDetail.
 
 ```java
 @AutoValue
@@ -99,7 +105,7 @@ public abstract class UserDetail {
 }
 ```
 
-Now the AutoValue Gson will be able to generate all the code needed to serialize and deserialize the object for us.
+Now the extension will be able to generate the code needed to serialize and deserialize the object for us. Cool but I don't like to write this for everyobject...
 
 ## Android Studio live template
 
@@ -134,32 +140,6 @@ public class AutoValueGsonTypeAdapterFactory implements TypeAdapterFactory {
 
         return null;
     }
-}
-```
-
-# Parsing JSON
-## Dummy file
-I've created some data using the website http://www.json-generator.com
-
-```java
-public class DummyJsonProvider {
-    public static String DUMMY_JSON = "[\n" +
-            "  {\n" +
-            "    \"_id\": \"576869ed835bc5884bf7179e\",\n" +
-            "    \"index\": 0,\n" +
-            "    \"guid\": \"5f4b447c-4911-4ee2-bdc4-8d71c7f2a6d4\",\n" +
-            "    \"picture\": \"http://placehold.it/32x32\",\n" +
-            "    \"age\": 31,\n" +
-            "    \"eyeColor\": \"green\",\n" +
-            "    \"name\": \"Gwendolyn Riggs\",\n" +
-            "    \"gender\": \"female\",\n" +
-            "    \"company\": \"XOGGLE\",\n" +
-            "    \"email\": \"gwendolynriggs@xoggle.com\",\n" +
-            "    \"phone\": \"+1 (983) 458-3698\",\n" +
-            "    \"address\": \"923 Calyer Street, Toftrees, Oklahoma, 2959\",\n" +
-            "    \"about\": \"Consectetur dolor sit duis laboris incididunt non ex qui. Dolore cillum Lorem consectetur consequat sint id amet ullamco pariatur irure. Elit amet eu occaecat qui ad. Ex amet mollit commodo reprehenderit eiusmod. Laboris ad irure consectetur eiusmod excepteur tempor consequat incididunt mollit aliquip consectetur nulla.\\r\\n\"\n" +
-            "  },\n";
-            // x50 static random data
 }
 ```
 

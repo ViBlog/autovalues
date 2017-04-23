@@ -6,7 +6,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.ryanharter.auto.value.gson.AutoValueGsonTypeAdapterFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -20,7 +19,5 @@ public class AutoValueApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-
     }
 }

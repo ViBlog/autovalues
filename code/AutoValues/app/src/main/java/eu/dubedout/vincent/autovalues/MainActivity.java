@@ -11,13 +11,13 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.ryanharter.auto.value.gson.AutoValueGsonTypeAdapterFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import eu.dubedout.vincent.autovalues.gsonpost.DummyJsonProvider;
+import eu.dubedout.vincent.autovalues.gsonpost.MyAdapterFactory;
 import eu.dubedout.vincent.autovalues.gsonpost.UserDetailAutoValued;
 import eu.dubedout.vincent.autovalues.gsonpost.UserDetailWithoutAutoValue;
 
@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < loopNumber; i++) {
             List<UserDetailWithoutAutoValue> userDetail = gson.fromJson(DummyJsonProvider.DUMMY_JSON, type);
         }
-
         float totalDuration = System.currentTimeMillis() - startTimer;
 
         Log.d(TAG, "onCreate: end basic deserialization. Duration="+totalDuration);
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         long startTimer = System.currentTimeMillis();
 
         Gson gson = new GsonBuilder()
-                .registerTypeAdapterFactory(new AutoValueGsonTypeAdapterFactory())
+                .registerTypeAdapterFactory(MyAdapterFactory.create())
                 .create();
         Type type = new TypeToken<ArrayList<UserDetailAutoValued>>() {}.getType();
         for (int i = 0; i < loopNumber; i++) {

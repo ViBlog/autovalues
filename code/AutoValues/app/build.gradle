@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "eu.dubedout.vincent.autovalues"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -22,15 +22,16 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 
     // Autovalue google
-    apt 'com.google.auto.value:auto-value:1.2'
-    provided 'com.jakewharton.auto.value:auto-value-annotations:1.2-update1'
-    apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.1'
-    apt 'com.ryanharter.auto.value:auto-value-gson:0.3.1'
+    apt 'com.google.auto.value:auto-value:1.4.1'
+    provided 'com.jakewharton.auto.value:auto-value-annotations:1.4'
+    apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.5'
+    apt 'com.ryanharter.auto.value:auto-value-gson:0.4.6'
+    provided 'com.ryanharter.auto.value:auto-value-gson:0.4.6'
 
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.code.gson:gson:2.8.0'
 
     // testing
     testCompile 'junit:junit:4.12'
